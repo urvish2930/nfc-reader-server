@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NFC Reader - Computer Client</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #nfcData {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+        .status {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>NFC Reader - Computer Client</h1>
+    <div id="connectionStatus" class="status disconnected">Disconnected</div>
+    <h2>Received NFC Data:</h2>
+    <div id="nfcData">Waiting for NFC data...</div>
+
+    <script>
+        const serverUrl = 'http://localhost:3000';
+        const socket = io(serverUrl);
+        const statusDiv = document.getElementById('connectionStatus');
+        const nfcDataDiv = document.getElementById('nfcData');
+
+        socket.on('connect', () => {
+            statusDiv.textContent = 'Connected';
+            statusDiv.className = 'status connected';
+        });
+
+        socket.on('disconnect', () => {
+            statusDiv.textContent = 'Disconnected';
+            statusDiv.className = 'status disconnected';
+        });
+
+        socket.on('nfcDataReceived', (data) => {
+            const timestamp = new Date().toLocaleTimeString();
+            nfcDataDiv.innerHTML = `
+                <p><strong>Time:</strong> ${timestamp}</p>
+                <p><strong>Data:</strong> ${JSON.stringify(data, null, 2)}</p>
+            `;
+        });
+    </script>
+</body>
+</html>
